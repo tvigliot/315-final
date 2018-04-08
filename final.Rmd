@@ -2,3 +2,24 @@
 library(tidyverse)
 ```
 
+```{r}
+data = read.csv("actions_under_antiquities_act.csv")
+data
+```
+```{r}
+library(plyr)
+#data[!is.na(data$acres_affected),]
+year_mean = ddply(data, ~year, summarise, mean = mean(as.numeric(acres_affected), na.rm=TRUE))
+```
+
+```{r}
+ggplot(year_mean, aes(x =year, y = mean)) + geom_point() + labs(title = "year vs average number of acres affected", y = "mean acres affected") + geom_smooth()
+```
+```{r}
+ggplot(data, aes(x = current_agency)) + geom_bar(stat = "count")
+```
+
+```{r}
+ggplot(data, aes(x = pres_or_congress)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title = "frequency of things",  )
+```
+
