@@ -57,9 +57,12 @@ presidents = data[!grepl("[0-9]", data$pres_or_congress),]
 presidents = presidents[presidents$pres_or_congress!="",]
 ```
 
+```{r}
+presidents$pres_or_congress[grepl("Obama", presidents$pres_or_congress)] = "B.H. Obama"
+```
 
 ```{r}
-ggplot(presidents, aes(x = pres_or_congress)) + geom_bar(aes(fill = action)) + theme(axis.text.x = element_text(angle = 45, hjust =1)) + labs(title = "frequency of things" )
+ggplot(presidents, aes(x = pres_or_congress)) + geom_bar(aes(fill = action)) + theme(axis.text.x = element_text(angle = 45, hjust =1)) + labs(title = "frequency of things" ) + labs(x = "president", y = "number of actions", title = "presidents by national park frequency")
 ```
 
 ```{r}
