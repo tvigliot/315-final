@@ -4,8 +4,11 @@ library(tidyverse)
 
 ```{r}
 data = read.csv("actions_under_antiquities_act.csv")
-data
+data$action <- as.character(data$action)
+data$pres_or_congress <- as.character(data$pres_or_congress)
 ```
+
+
 ```{r}
 library(plyr)
 #data[!is.na(data$acres_affected),]
@@ -13,13 +16,53 @@ year_mean = ddply(data, ~year, summarise, mean = mean(as.numeric(acres_affected)
 ```
 
 ```{r}
-ggplot(year_mean, aes(x =year, y = mean)) + geom_point() + labs(title = "year vs average number of acres affected", y = "mean acres affected") + geom_smooth()
-```
-```{r}
-ggplot(data, aes(x = current_agency)) + geom_bar(stat = "count")
+#filter(data,grepl("Redesignated",action))
+data$action[grepl("Redesignated", data$action)] = "Redesignated"
+data$action[grepl("Incorporated", data$action)] = "Incorporated"
+data$action[grepl("Transferred", data$action)] = "Transferred"
+data$action[grepl("Abolished", data$action)] = "Abolished"
+data$action[grepl("Enlarged", data$action)] = "Enlarged"
+data$action[grepl("Established", data$action)] = "Established"
+data$action[grepl("Renamed", data$action)] = "Renamed"
+
+data$action[!grepl("Diminished|Enlarged|Established|Incorporated|Redesignated|Transferred", data$action)] = "Other"
+
+# data$action[grepl("Included|Now|", data$action)] = "Abolished"
 ```
 
 ```{r}
-ggplot(data, aes(x = pres_or_congress)) + geom_bar() + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(title = "frequency of things",  )
+unique(data$action)
+```
+```{r}
+ggplot(data, aes(x = action)) + geom_bar() +  theme(axis.text.x = element_text(angle = 90))
+```
+
+
+```{r}
+data
+```
+
+
+```{r}
+ggplot(year_mean, aes(x =year, y = mean)) + geom_point() + labs(title = "year vs average number of acres affected", y = "mean acres affected") + geom_smooth()
+```
+```{r}
+ggplot(data, aes(x = current_agency)) + geom_bar(stat = "count") + theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+
+
+```{r}
+presidents = data[!grepl("[0-9]", data$pres_or_congress),]
+presidents = presidents[presidents$pres_or_congress!="",]
+```
+
+
+```{r}
+ggplot(presidents, aes(x = pres_or_congress)) + geom_bar(aes(fill = action)) + theme(axis.text.x = element_text(angle = 45, hjust =1)) + labs(title = "frequency of things" )
+```
+
+```{r}
+presidents$pres_or_congress
 ```
 
