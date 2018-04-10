@@ -24,7 +24,6 @@ data$action[grepl("Abolished", data$action)] = "Abolished"
 data$action[grepl("Enlarged", data$action)] = "Enlarged"
 data$action[grepl("Established", data$action)] = "Established"
 data$action[grepl("Renamed", data$action)] = "Renamed"
-
 data$action[!grepl("Diminished|Enlarged|Established|Incorporated|Redesignated|Transferred", data$action)] = "Other"
 
 # data$action[grepl("Included|Now|", data$action)] = "Abolished"
@@ -59,13 +58,16 @@ presidents = presidents[presidents$pres_or_congress!="",]
 
 ```{r}
 presidents$pres_or_congress[grepl("Obama", presidents$pres_or_congress)] = "B.H. Obama"
+presidents$pres_or_congress[grepl("Bush", presidents$pres_or_congress)] = "G.W. Bush"
+
 ```
 
 ```{r}
-ggplot(presidents, aes(x = pres_or_congress)) + geom_bar(aes(fill = action)) + theme(axis.text.x = element_text(angle = 45, hjust =1)) + labs(title = "frequency of things" ) + labs(x = "president", y = "number of actions", title = "presidents by national park frequency")
+ggplot(presidents[order(presidents$year),], aes(x = pres_or_congress)) + geom_bar(aes(fill = action)) + coord_flip() + labs(title = "frequency of things") + labs(x = "president", y = "number of actions", title = "presidents by frequency national park frequency")
 ```
 
 ```{r}
-presidents$pres_or_congress
+
 ```
+
 
