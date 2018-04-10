@@ -1,0 +1,41 @@
+---
+title: "tvigliot-static"
+output: html_document
+---
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(readr)
+library(scales)
+library(dendextend)
+library(stringr)
+
+options(scipen=999)
+
+data = read_csv("actions_under_antiquities_act.csv", 
+    col_types = cols(acres_affected = col_number()))
+
+established <- subset(data, acres_affected >= 1500000 & action == "Established")
+
+established %>% dplyr::select(year, acres_affected) %>% 
+  scale() %>% dist() %>% hclust(method = "complete") %>% as.dendrogram %>% 
+  set("labels", established$current_name, order_value = TRUE) %>% set("labels_cex", .5) %>%
+  ggplot(horiz = TRUE) +
+  labs(title = "Hierarchical Clustering of the Largest National Monuments\nBased on Year and Size")
+
+presidents <- subset(group_by(data, pres_or_congress) %>% 
+                       summarize(acres_affected = sum(acres_affected)), acres_affected > 1000000)
+
+ggplot(presidents, aes(x = reorder(pres_or_congress, -acres_affected), y = acres_affected)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Amount of Federal Land Affected by President",
+       x = "President", y = "Acres Affected") +
+  scale_y_continuous(labels = comma)
+
+
+```
+
+This graph shows how closely clustered the largest national monuments in the United States are. Those created around the same time period and those with similar size are grouped more closely together.
+
+This plot shows the amount of land affected by the presidents who designated the most land under the Antiquities act. Jimmy Carter has designated the most land. He designated large portions of Alaska to gain this distinction.
+
