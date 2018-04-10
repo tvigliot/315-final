@@ -1,0 +1,78 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+data = read.csv("actions_under_antiquities_act.csv")
+data
+```
+
+```{r}
+dataPre1960 = data[data$year<1950,]
+dataPost1960 = data[data$year>1950,]
+
+dataPre1960$acres_affected = as.numeric(dataPre1960$acres_affected)
+
+
+dataPre1960 <- dataPre1960 %>%
+  dplyr::select(states,acres_affected) %>%
+  mutate(states = tolower(states)) %>%
+  arrange(states) %>%
+  group_by(states) %>%
+  summarize(mean = mean(acres_affected,na.rm = T))
+
+state_data <- data_frame(state.name) %>%
+  mutate(state.name = tolower(state.name)) %>%
+  right_join(dataPre1960, by = c("state.name" = "states"))
+
+state_borders <- map_data("state") %>%
+  left_join(state_data, by = c("region" = "state.name"))
+
+
+ggplot(state_borders, aes(x = long, y = lat, fill = as.numeric(mean))) + 
+  geom_polygon(aes(group = group), color = "black") + 
+  theme_void() + 
+  coord_map("polyconic") + 
+  scale_fill_gradient2(high = "brown", low = "purple",
+                       mid = "white") +
+  labs(title = "Average Acres Affected per State, Before 1960",
+       fill = "Average Acres Affected") +
+  theme(legend.position = "bottom")
+
+
+dataPost1960$acres_affected = as.numeric(dataPost1960$acres_affected)
+
+
+dataPost1960 <- dataPost1960 %>%
+  dplyr::select(states,acres_affected) %>%
+  mutate(states = tolower(states)) %>%
+  arrange(states) %>%
+  group_by(states) %>%
+  summarize(mean = mean(acres_affected,na.rm = T))
+
+
+state_data <- data_frame(state.name) %>%
+  mutate(state.name = tolower(state.name)) %>%
+  right_join(dataPost1960, by = c("state.name" = "states"))
+
+state_borders <- map_data("state") %>%
+  left_join(state_data, by = c("region" = "state.name"))
+
+
+ggplot(state_borders, aes(x = long, y = lat, fill = as.numeric(mean))) + 
+  geom_polygon(aes(group = group), color = "black") + 
+  theme_void() + 
+  coord_map("polyconic") + 
+  scale_fill_gradient2(high = "brown", low = "purple",
+                       mid = "white") +
+  labs(title = "Average Acres Affected per State, After 1960",
+       fill = "Average Acres Affected") +
+  theme(legend.position = "bottom")
+```
+
+The pre-1960 map displays the average number of acres affected in each state. We see an abundance of acres affected primarily in the mid-western region, and south-east. There seems to be a lot of acres affected specifically in Nevada and Ohio.
+The post-1960 map shows an increase in activity in the northeastern region, with acres affected still also being part of the midwestern region. Maine seems to be a primary source of affected acres.
+
+
+
